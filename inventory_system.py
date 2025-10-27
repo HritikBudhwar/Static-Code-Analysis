@@ -1,7 +1,8 @@
+"""Inventory Management System — a Python-based program to manage, update
+, and store stock data securely."""
 import json
 import logging
 from datetime import datetime
-
 
 logging.basicConfig(
     filename="inventory.log",
@@ -18,7 +19,9 @@ def add_item(item: str, qty: int, logs=None) -> None:
         logs = []
 
     if not isinstance(item, str) or not isinstance(qty, int):
-        logging.warning("Invalid input types for add_item: item=%s, qty=%s", item, qty)
+        logging.warning(
+            "Invalid input types for add_item: item=%s, qty=%s", item, qty
+        )
         return
 
     if not item:
@@ -33,7 +36,9 @@ def add_item(item: str, qty: int, logs=None) -> None:
 def remove_item(item: str, qty: int) -> None:
     """Remove quantity of an item from stock data."""
     if not isinstance(item, str) or not isinstance(qty, int):
-        logging.warning("Invalid input types for remove_item: item=%s, qty=%s", item, qty)
+        logging.warning(
+            "Invalid input types for remove_item: item=%s, qty=%s", item, qty
+        )
         return
 
     try:
@@ -46,7 +51,7 @@ def remove_item(item: str, qty: int) -> None:
         logging.info("Removed %d of %s", qty, item)
     except KeyError:
         logging.error("Attempted to remove non-existent item: %s", item)
-    except Exception as error:
+    except (OSError, ValueError) as error:
         logging.error("Unexpected error while removing item: %s", error)
 
 
@@ -55,27 +60,30 @@ def get_qty(item: str) -> int:
     return stock_data.get(item, 0)
 
 
-def load_data(file_path: str = "inventory.json") -> None:
+def load_data(file_path: str = "inventory.json") -> dict:
     """Load stock data from a JSON file."""
-    global stock_data
     try:
         with open(file_path, "r", encoding="utf-8") as file:
-            stock_data = json.load(file)
+            data = json.load(file)
         logging.info("Data loaded from %s", file_path)
+        return data
     except FileNotFoundError:
-        logging.warning("File %s not found. Starting with empty inventory.", file_path)
-        stock_data = {}
+        logging.warning(
+            "File %s not found. Starting with empty inventory.", file_path
+        )
+        return {}
     except json.JSONDecodeError:
         logging.error("Invalid JSON format in %s", file_path)
+        return {}
 
 
-def save_data(file_path: str = "inventory.json") -> None:
+def save_data(data: dict, file_path: str = "inventory.json") -> None:
     """Save stock data to a JSON file."""
     try:
         with open(file_path, "w", encoding="utf-8") as file:
-            json.dump(stock_data, file, indent=4)
+            json.dump(data, file, indent=4)
         logging.info("Data saved to %s", file_path)
-    except Exception as error:
+    except (OSError, TypeError) as error:
         logging.error("Failed to save data: %s", error)
 
 
@@ -93,14 +101,15 @@ def check_low_items(threshold: int = 5) -> list:
 
 def main() -> None:
     """Main function to test inventory system."""
+    data = load_data()
+
     add_item("apple", 10)
     add_item("banana", 2)
     remove_item("apple", 3)
     remove_item("orange", 1)
     print(f"Apple stock: {get_qty('apple')}")
     print(f"Low items: {check_low_items()}")
-    save_data()
-    load_data()
+    save_data(data)
     print_data()
 
 
