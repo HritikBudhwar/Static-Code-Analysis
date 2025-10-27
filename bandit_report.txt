@@ -1,10 +1,10 @@
-Run started:2025-10-27 07:15:43.868076
+Run started:2025-10-27 08:34:44.996911
 
 Test results:
 	No issues identified.
 
 Code scanned:
-	Total lines of code: 0
+	Total lines of code: 82
 	Total lines skipped (#nosec): 0
 	Total potential issues skipped due to specifically being disabled (e.g., #nosec BXXX): 0
 
@@ -19,5 +19,4 @@ Run metrics:
 		Low: 0
 		Medium: 0
 		High: 0
-Files skipped (1):
-	./inventory_system.py (No such file or directory)
+Files skipped (0):
